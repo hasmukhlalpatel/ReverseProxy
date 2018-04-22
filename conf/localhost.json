@@ -1,0 +1,33 @@
+{
+    "listen":80,
+    "server_name":["localhost", "localhost:5050"],
+    "locations":[
+        {
+            "rule":"/page1",
+            "target": "http://127.0.0.1:5060"
+        },
+        {
+            "rule":"/site1/*",
+            "rewriteUrl":"/*",
+            "target": "http://127.0.0.1:5060"
+        },
+        {
+            "rule":"^\/site2(.*)$",
+            "rewriteUrl":"/$1",
+            "target": "http://127.0.0.1:5060"
+        },
+        {
+            "rule":"\/site3((\/\\S*)*)$",
+            "rewriteUrl":"/$1",
+            "target": "http://127.0.0.1:5060"
+        },        
+        {
+            "rule":"/",
+            "target": "http://127.0.0.1:7800"
+        }
+    ],
+    "default":{
+        "target": "http://127.0.0.1:7800"
+    }
+
+}
