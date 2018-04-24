@@ -24,6 +24,7 @@ proxy.on('proxyReq', function(proxyReq, req, res, options) {
   proxyReq.setHeader('X-Special-Proxy-Header', 'foobar');
 });
 
+/*
 proxy.on('proxyRes', function(proxyRes, req, res, options) {
   console.log("Got response: " + res.statusCode);
   proxyRes.on('data' , function(dataBuffer){
@@ -31,6 +32,7 @@ proxy.on('proxyRes', function(proxyRes, req, res, options) {
     console.log("This is the data from target server : "+ data);
   });
 });
+*/
 
 proxy.on('error', function (err, req, res) {
   res.writeHead(500, {'Content-Type': 'text/plain'});
@@ -45,7 +47,7 @@ var server = http.createServer(function(req, res) {
     if(config != null) {
       var configTarget = config.match(req);
       if(configTarget != null){
-        //target: 'http://127.0.0.1:7800' //target: 'http://127.0.0.1:5060'
+        console.log("Target: "+ configTarget);
         return proxy.web(req, res, {target: configTarget});
       }
     }
