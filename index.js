@@ -3,6 +3,8 @@ var http = require('http'),
 var fs = require('fs');
 var httpProxyLocations = require('./httpProxyLocations'); 
 var httpProxyConf = require('./httpProxyConf');
+var port = process.env.PORT||5050;
+var port2 = process.env.PORT2||5051;
 
 var serverConfigs = new httpProxyConf().load();
 //
@@ -30,24 +32,33 @@ proxy.on('proxyRes', function(proxyRes, req, res, options) {
   });
 });
 
+proxy.on('error', function (err, req, res) {
+  res.writeHead(500, {'Content-Type': 'text/plain'});
+  res.end('Something went wrong. And we are reporting a custom error message.');
+});
+
 var server = http.createServer(function(req, res) {
   let hostname = req.headers["host"];
   console.log("Url: "+ hostname + req.url);
-
-  var config = serverConfigs[hostname];
-  if(config != null) {
-    var configTarget = config.match(req);
-    if(configTarget != null){
-      //target: 'http://127.0.0.1:7800' //target: 'http://127.0.0.1:5060'
-      return proxy.web(req, res, {target: configTarget});
+  try {
+    var config = serverConfigs[hostname];
+    if(config != null) {
+      var configTarget = config.match(req);
+      if(configTarget != null){
+        //target: 'http://127.0.0.1:7800' //target: 'http://127.0.0.1:5060'
+        return proxy.web(req, res, {target: configTarget});
+      }
     }
+    res.writeHead(500, { 'Content-Type': 'text/plain' });
+    res.end('Could not find the requested url and path!');
+  } catch (error) {
+    res.writeHead(500, { 'Content-Type': 'text/plain' });
+    res.end('An error has occured :' + error);
   }
-  res.writeHead(500, { 'Content-Type': 'text/plain' });
-  res.end('Could not for the requested url and path!');
 });
 
-console.log("listening on port 5050")
-server.listen(5050);
+console.log("listening on port " + port)
+server.listen(port);
 
 
 var setupServer = http.createServer(function(req, res) {
@@ -58,8 +69,8 @@ var setupServer = http.createServer(function(req, res) {
   res.end();
 });
 
-console.log("setup Server listening on port 5051")
-setupServer.listen(5051);
+console.log("setup Server listening on port "+ port2)
+setupServer.listen(port2);
 
 
 
